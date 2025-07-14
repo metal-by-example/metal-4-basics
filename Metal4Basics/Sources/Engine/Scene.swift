@@ -199,6 +199,11 @@ extension Scene {
                 let hasMultipleUVs = mdlMesh.vertexDescriptor.vertexAttributes.count(where: {
                     $0.name == MDLVertexAttributeTextureCoordinate
                 }) > 1
+
+                let hasColor = mdlMesh.vertexDescriptor.vertexAttributes.count { attribute in
+                    attribute.name == MDLVertexAttributeColor
+                } > 0
+
                 let vertexDescriptor = MDLVertexDescriptor()
                 vertexDescriptor.vertexAttributes[0].name = MDLVertexAttributePosition
                 vertexDescriptor.vertexAttributes[0].format = .float4
@@ -216,13 +221,26 @@ extension Scene {
                 vertexDescriptor.vertexAttributes[3].format = .float2
                 vertexDescriptor.vertexAttributes[3].offset = 48
                 vertexDescriptor.vertexAttributes[3].bufferIndex = 0
+
+                var currentOffset = vertexDescriptor.vertexAttributes[3].offset + 8 // vertexDescriptor.vertexAttributes[3].offset + sizeof(float2)
+
                 if hasMultipleUVs {
                     vertexDescriptor.vertexAttributes[4].name = MDLVertexAttributeTextureCoordinate
                     vertexDescriptor.vertexAttributes[4].format = .float2
-                    vertexDescriptor.vertexAttributes[4].offset = 56
+                    vertexDescriptor.vertexAttributes[4].offset = currentOffset
                     vertexDescriptor.vertexAttributes[4].bufferIndex = 0
+                    currentOffset += 8 // sizeof(float2)
                 }
-                vertexDescriptor.bufferLayouts[0].stride = hasMultipleUVs ? 64 : 56
+
+                if hasColor {
+                    vertexDescriptor.vertexAttributes[5].name = MDLVertexAttributeColor
+                    vertexDescriptor.vertexAttributes[5].format = .float4
+                    vertexDescriptor.vertexAttributes[5].offset = currentOffset
+                    vertexDescriptor.vertexAttributes[5].bufferIndex = 0
+                    currentOffset += 16 // sizeof(float4)
+                }
+
+                vertexDescriptor.bufferLayouts[0].stride = currentOffset
                 mdlMesh.vertexDescriptor = vertexDescriptor
 
                 mdlMesh.addOrthTanBasis(forTextureCoordinateAttributeNamed: MDLVertexAttributeTextureCoordinate,
