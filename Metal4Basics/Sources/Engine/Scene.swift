@@ -202,7 +202,7 @@ extension Scene {
 
                 let hasColor = mdlMesh.vertexDescriptor.vertexAttributes.count { attribute in
                     attribute.name == MDLVertexAttributeColor
-                } > 1
+                } > 0
 
                 let vertexDescriptor = MDLVertexDescriptor()
                 vertexDescriptor.vertexAttributes[0].name = MDLVertexAttributePosition
