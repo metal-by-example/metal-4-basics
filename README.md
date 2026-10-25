@@ -6,4 +6,4 @@ The sample app renders a simple USDZ scene of a tropical island featuring a trea
 
 ![A screenshot of the sample app](screenshots/metal4.png)
 
-To run the sample app in Metal 4 mode, you should use Xcode 26 (Beta 2) or later and run on iOS 26 (Beta 3) or macOS 26 (Beta 3) or later. This sample may be subject to revision due to changes in the Metal 4 API, which is in beta as of this writing.
+To run the sample app in Metal 4 mode, you should use Xcode 26 (Beta 2) or later and run on iOS 26 (Beta 3) or macOS 26 (Beta 3) or later.
