@@ -196,33 +196,49 @@ extension Scene {
                 // We need our attributes to be a certain order, but we also want to be flexible
                 // with respect to multiple texture coordinate sets, so we interleave and reorganize
                 // attribute data _after_ loading, in response to what the mesh actually contains.
-                let hasMultipleUVs = mdlMesh.vertexDescriptor.vertexAttributes.count(where: {
+                let hasMultipleUVs = mdlMesh.vertexDescriptor.vertexAttributes.count {
                     $0.name == MDLVertexAttributeTextureCoordinate
-                }) > 1
+                } > 1
+                let hasVertexColors = mdlMesh.vertexDescriptor.vertexAttributes.count {
+                    $0.name == MDLVertexAttributeColor
+                } > 0
                 let vertexDescriptor = MDLVertexDescriptor()
+                var currentOffset = 0
                 vertexDescriptor.vertexAttributes[0].name = MDLVertexAttributePosition
                 vertexDescriptor.vertexAttributes[0].format = .float4
-                vertexDescriptor.vertexAttributes[0].offset = 0
+                vertexDescriptor.vertexAttributes[0].offset = currentOffset
                 vertexDescriptor.vertexAttributes[0].bufferIndex = 0
+                currentOffset += 16
                 vertexDescriptor.vertexAttributes[1].name = MDLVertexAttributeNormal
                 vertexDescriptor.vertexAttributes[1].format = .float3
-                vertexDescriptor.vertexAttributes[1].offset = 16
+                vertexDescriptor.vertexAttributes[1].offset = currentOffset
                 vertexDescriptor.vertexAttributes[1].bufferIndex = 0
+                currentOffset += 16
                 vertexDescriptor.vertexAttributes[2].name = MDLVertexAttributeTangent
                 vertexDescriptor.vertexAttributes[2].format = .float4
-                vertexDescriptor.vertexAttributes[2].offset = 32
+                vertexDescriptor.vertexAttributes[2].offset = currentOffset
                 vertexDescriptor.vertexAttributes[2].bufferIndex = 0
+                currentOffset += 16
                 vertexDescriptor.vertexAttributes[3].name = MDLVertexAttributeTextureCoordinate
                 vertexDescriptor.vertexAttributes[3].format = .float2
-                vertexDescriptor.vertexAttributes[3].offset = 48
+                vertexDescriptor.vertexAttributes[3].offset = currentOffset
                 vertexDescriptor.vertexAttributes[3].bufferIndex = 0
+                currentOffset += 8
                 if hasMultipleUVs {
                     vertexDescriptor.vertexAttributes[4].name = MDLVertexAttributeTextureCoordinate
                     vertexDescriptor.vertexAttributes[4].format = .float2
-                    vertexDescriptor.vertexAttributes[4].offset = 56
+                    vertexDescriptor.vertexAttributes[4].offset = currentOffset
                     vertexDescriptor.vertexAttributes[4].bufferIndex = 0
+                    currentOffset += 8
                 }
-                vertexDescriptor.bufferLayouts[0].stride = hasMultipleUVs ? 64 : 56
+                if hasVertexColors {
+                    vertexDescriptor.vertexAttributes[5].name = MDLVertexAttributeColor
+                    vertexDescriptor.vertexAttributes[5].format = .float4
+                    vertexDescriptor.vertexAttributes[5].offset = currentOffset
+                    vertexDescriptor.vertexAttributes[5].bufferIndex = 0
+                    currentOffset += 16
+                }
+                vertexDescriptor.bufferLayouts[0].stride = currentOffset
                 mdlMesh.vertexDescriptor = vertexDescriptor
 
                 mdlMesh.addOrthTanBasis(forTextureCoordinateAttributeNamed: MDLVertexAttributeTextureCoordinate,
